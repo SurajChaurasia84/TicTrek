@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "tictrek" "\0"
+            VALUE "CompanyName", "com.tictrek.toe.gems" "\0"
+            VALUE "FileDescription", "TicTrek" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "tictrek" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
+            VALUE "InternalName", "TicTrek" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.tictrek.toe.gems. All rights reserved." "\0"
             VALUE "OriginalFilename", "tictrek.exe" "\0"
-            VALUE "ProductName", "tictrek" "\0"
+            VALUE "ProductName", "TicTrek" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
