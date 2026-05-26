@@ -8,8 +8,9 @@ import 'screens/company_splash.dart';
 import 'screens/loading_screen.dart';
 import 'screens/main_tab_screen.dart';
 import 'screens/game_screen.dart';
+import 'services/ad_manager.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
@@ -19,6 +20,14 @@ void main() {
     systemNavigationBarIconBrightness: Brightness.light,
   ));
   runApp(const MyApp());
+
+  // Initialize AdMob and load ads asynchronously in the background so the
+  // Splash Screen renders immediately without any startup delay.
+  AdManager.instance.initialize().then((_) {
+    AdManager.instance.loadAppOpenAd();
+    AdManager.instance.loadInterstitialAd();
+    AdManager.instance.loadRewardedAd();
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -78,6 +87,7 @@ class _GameManagerState extends State<GameManager> {
   int _playerWins = 0;
   int _aiWins = 0;
   int _draws = 0;
+  int _playerCoins = 100;
   SharedPreferences? _prefs;
 
   @override
@@ -98,6 +108,7 @@ class _GameManagerState extends State<GameManager> {
       _playerWins = _prefs?.getInt('playerWins') ?? 0;
       _aiWins = _prefs?.getInt('aiWins') ?? 0;
       _draws = _prefs?.getInt('draws') ?? 0;
+      _playerCoins = _prefs?.getInt('playerCoins') ?? 100;
       int diffIndex = _prefs?.getInt('selectedDifficulty') ?? Difficulty.medium.index;
       _selectedDifficulty = Difficulty.values[diffIndex];
     });
@@ -118,7 +129,9 @@ class _GameManagerState extends State<GameManager> {
   }
 
   void _backToHome() {
+    // Re-load coins and stats just in case they were updated in game
     setState(() {
+      _playerCoins = _prefs?.getInt('playerCoins') ?? 100;
       _currentScreen = ScreenState.homeScreen;
     });
   }
@@ -127,13 +140,26 @@ class _GameManagerState extends State<GameManager> {
     setState(() {
       if (winner == 'X') {
         _playerWins++;
+        _playerCoins += 50;
         _prefs?.setInt('playerWins', _playerWins);
+        _prefs?.setInt('playerCoins', _playerCoins);
       } else if (winner == 'O') {
         _aiWins++;
         _prefs?.setInt('aiWins', _aiWins);
       } else if (winner == 'Draw') {
         _draws++;
+        _playerCoins += 20;
         _prefs?.setInt('draws', _draws);
+        _prefs?.setInt('playerCoins', _playerCoins);
+      }
+
+      // Interstitial ad: show after every 3rd completed match
+      int matchesCount = (_prefs?.getInt('matchesCount') ?? 0) + 1;
+      _prefs?.setInt('matchesCount', matchesCount);
+      if (matchesCount % 3 == 0) {
+        AdManager.instance.showInterstitialAdIfAvailable(() {
+          // No extra action needed — game flow continues normally
+        });
       }
     });
   }
@@ -143,9 +169,13 @@ class _GameManagerState extends State<GameManager> {
       _playerWins = 0;
       _aiWins = 0;
       _draws = 0;
+      _playerCoins = 100;
       _prefs?.setInt('playerWins', 0);
       _prefs?.setInt('aiWins', 0);
       _prefs?.setInt('draws', 0);
+      _prefs?.setInt('playerCoins', 100);
+      _prefs?.setString('equippedSkinId', 'classic');
+      _prefs?.setStringList('ownedSkinIds', ['classic']);
     });
   }
 
@@ -213,8 +243,14 @@ class _GameManagerState extends State<GameManager> {
           playerWins: _playerWins,
           opponentWins: _aiWins,
           draws: _draws,
+          playerCoins: _playerCoins,
           onResetStats: _resetStats,
           prefs: _prefs,
+          onCoinsChanged: () {
+            setState(() {
+              _playerCoins = _prefs?.getInt('playerCoins') ?? 100;
+            });
+          },
         );
       case ScreenState.gameScreen:
         return GameScreenView(
@@ -313,3 +349,34 @@ class VibrationHelper {
     }
   }
 }
+
+class SkinItem {
+  final String id;
+  final String name;
+  final String xMarker;
+  final String oMarker;
+  final String rarity;
+  final int price;
+
+  const SkinItem({
+    required this.id,
+    required this.name,
+    required this.xMarker,
+    required this.oMarker,
+    required this.rarity,
+    required this.price,
+  });
+}
+
+const List<SkinItem> allSkins = [
+  SkinItem(id: 'classic', name: 'Classic', xMarker: 'X', oMarker: 'O', rarity: 'Common', price: 0),
+  SkinItem(id: 'neon', name: 'Neon', xMarker: 'X', oMarker: 'O', rarity: 'Rare', price: 200),
+  SkinItem(id: 'scribble', name: 'Scribble', xMarker: 'X', oMarker: 'O', rarity: 'Rare', price: 300),
+  SkinItem(id: 'elemental', name: 'Elemental', xMarker: '🔥', oMarker: '💧', rarity: 'Epic', price: 600),
+  SkinItem(id: 'digital', name: 'Digital', xMarker: '👾', oMarker: '🤖', rarity: 'Epic', price: 800),
+  SkinItem(id: 'cosmic', name: 'Cosmic', xMarker: '🪐', oMarker: '💫', rarity: 'Epic', price: 1000),
+  SkinItem(id: 'royal', name: 'Royal', xMarker: '👑', oMarker: '🛡️', rarity: 'Legendary', price: 1500),
+  SkinItem(id: 'stellar', name: 'Stellar', xMarker: '☀️', oMarker: '🌙', rarity: 'Legendary', price: 1800),
+  SkinItem(id: 'ninja', name: 'Ninja', xMarker: '🥷', oMarker: '⭐', rarity: 'Legendary', price: 2000),
+  SkinItem(id: 'dragon', name: 'Dragon', xMarker: '🐉', oMarker: '🏰', rarity: 'Legendary', price: 2500),
+];
