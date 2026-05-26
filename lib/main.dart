@@ -79,7 +79,7 @@ class GameManager extends StatefulWidget {
   State<GameManager> createState() => _GameManagerState();
 }
 
-class _GameManagerState extends State<GameManager> {
+class _GameManagerState extends State<GameManager> with WidgetsBindingObserver {
   ScreenState _currentScreen = ScreenState.companySplash;
   GameMode _selectedMode = GameMode.vsAi;
   Difficulty _selectedDifficulty = Difficulty.medium;
@@ -94,6 +94,7 @@ class _GameManagerState extends State<GameManager> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadPrefs();
     // Company Splash display duration
     Timer(const Duration(milliseconds: 2200), () {
@@ -178,6 +179,22 @@ class _GameManagerState extends State<GameManager> {
       _prefs?.setString('equippedSkinId', 'classic');
       _prefs?.setStringList('ownedSkinIds', ['classic']);
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      AudioManager.instance.pauseBgMusic();
+    } else if (state == AppLifecycleState.resumed) {
+      AudioManager.instance.resumeBgMusic(_prefs);
+    }
   }
 
   @override
@@ -301,6 +318,31 @@ class AudioManager {
       await _bgPlayer.stop();
     } catch (e) {
       debugPrint('Error stopping bg music: $e');
+    }
+  }
+
+  Future<void> pauseBgMusic() async {
+    try {
+      if (_bgPlayer.state == PlayerState.playing) {
+        await _bgPlayer.pause();
+      }
+    } catch (e) {
+      debugPrint('Error pausing bg music: $e');
+    }
+  }
+
+  Future<void> resumeBgMusic(SharedPreferences? prefs) async {
+    final bool soundEnabled = prefs?.getBool('soundEnabled') ?? true;
+    if (soundEnabled) {
+      try {
+        if (_bgPlayer.state == PlayerState.paused) {
+          await _bgPlayer.resume();
+        } else if (_bgPlayer.state == PlayerState.stopped) {
+          await startBgMusic(prefs);
+        }
+      } catch (e) {
+        debugPrint('Error resuming bg music: $e');
+      }
     }
   }
 
