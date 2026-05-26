@@ -175,7 +175,7 @@ class _SettingsScreenViewState extends State<SettingsScreenView> {
               subtitle: 'Data usage & policy information',
               color: Colors.cyanAccent,
               onTap: () async {
-                final Uri url = Uri.parse('https://tictrek.com/privacy-policy');
+                final Uri url = Uri.parse('https://surajchaurasia84.github.io/TicTrek/');
                 if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
