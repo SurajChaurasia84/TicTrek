@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
+import '../services/ad_manager.dart';
 import 'home_screen.dart';
 import 'shop_screen.dart';
 import 'settings_screen.dart';
@@ -13,8 +15,10 @@ class MainTabScreen extends StatefulWidget {
   final int playerWins;
   final int opponentWins;
   final int draws;
+  final int playerCoins;
   final VoidCallback onResetStats;
   final SharedPreferences? prefs;
+  final VoidCallback onCoinsChanged;
 
   const MainTabScreen({
     super.key,
@@ -24,8 +28,10 @@ class MainTabScreen extends StatefulWidget {
     required this.playerWins,
     required this.opponentWins,
     required this.draws,
+    required this.playerCoins,
     required this.onResetStats,
     required this.prefs,
+    required this.onCoinsChanged,
   });
 
   @override
@@ -34,6 +40,38 @@ class MainTabScreen extends StatefulWidget {
 
 class _MainTabScreenState extends State<MainTabScreen> {
   int _selectedIndex = 0;
+
+  BannerAd? _bannerAd;
+  bool _isBannerLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBannerAd();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd = BannerAd(
+      adUnitId: AdManager.bannerAdUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) {
+          if (mounted) setState(() => _isBannerLoaded = true);
+        },
+        onAdFailedToLoad: (ad, error) {
+          debugPrint('BannerAd failed to load: $error');
+          ad.dispose();
+        },
+      ),
+    )..load();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +87,15 @@ class _MainTabScreenState extends State<MainTabScreen> {
             child: _buildTabContent(),
           ),
         ),
+        // Banner Ad — sits just above the nav bar, persistent across all tabs
+        if (_isBannerLoaded && _bannerAd != null)
+          Container(
+            color: const Color(0xFF001F3A),
+            width: double.infinity,
+            height: _bannerAd!.size.height.toDouble(),
+            alignment: Alignment.center,
+            child: AdWidget(ad: _bannerAd!),
+          ),
         // Premium Bottom Navigation Bar
         _buildBottomNavBar(),
       ],
@@ -66,11 +113,18 @@ class _MainTabScreenState extends State<MainTabScreen> {
           playerWins: widget.playerWins,
           opponentWins: widget.opponentWins,
           draws: widget.draws,
+          playerCoins: widget.playerCoins,
           onResetStats: widget.onResetStats,
           prefs: widget.prefs,
+          onCoinsChanged: widget.onCoinsChanged,
         );
       case 1:
-        return const ShopScreenView(key: ValueKey('shop_tab'));
+        return ShopScreenView(
+          key: const ValueKey('shop_tab'),
+          prefs: widget.prefs,
+          playerCoins: widget.playerCoins,
+          onCoinsChanged: widget.onCoinsChanged,
+        );
       case 2:
         return SettingsScreenView(
           key: const ValueKey('settings_tab'),
