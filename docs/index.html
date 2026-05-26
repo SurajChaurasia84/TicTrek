@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - TicTrek</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-start: #0F4A81;
+            --bg-end: #002B4D;
+            --accent: #FDD835;
+            --accent-dark: #F5A623;
+            --text-main: #FFFFFF;
+            --text-muted: #BDC3C7;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Glow Blobs */
+        .glow-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        .glow-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent);
+            top: -100px;
+            left: -150px;
+        }
+        
+        .glow-2 {
+            width: 500px;
+            height: 500px;
+            background: #9B59B6;
+            bottom: -200px;
+            right: -150px;
+        }
+
+        header {
+            width: 100%;
+            max-width: 900px;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        main {
+            width: 95%;
+            max-width: 900px;
+            margin-bottom: 60px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1.5px solid var(--card-border);
+            border-radius: 28px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .last-updated {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-weight: 300;
+            border-bottom: 1.5px solid var(--card-border);
+            padding-bottom: 15px;
+        }
+
+        section {
+            margin-bottom: 35px;
+        }
+
+        section:last-of-type {
+            margin-bottom: 0;
+        }
+
+        h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background: linear-gradient(to bottom, var(--accent), var(--accent-dark));
+            border-radius: 2px;
+        }
+
+        p {
+            font-weight: 300;
+            color: #E2E8F0;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        p strong {
+            font-weight: 600;
+            color: #FFF;
+        }
+
+        ul {
+            list-style: none;
+            margin-bottom: 15px;
+            padding-left: 5px;
+        }
+
+        li {
+            font-weight: 300;
+            color: #E2E8F0;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 1.05rem;
+        }
+
+        li::before {
+            content: "✦";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s, text-decoration 0.2s;
+            font-weight: 600;
+        }
+
+        a:hover {
+            color: var(--accent-dark);
+            text-decoration: underline;
+        }
+
+        .contact-box {
+            background: rgba(253, 216, 53, 0.08);
+            border: 1.5px dashed rgba(253, 216, 53, 0.4);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 15px;
+        }
+
+        .contact-box p {
+            margin-bottom: 0;
+        }
+
+        .btn-email {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color: #4A2C0F;
+            padding: 12px 28px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 15px rgba(253, 216, 53, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-email:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(253, 216, 53, 0.5);
+            text-decoration: none;
+        }
+
+        .btn-email:active {
+            transform: translateY(0);
+        }
+
+        footer {
+            margin-top: auto;
+            width: 100%;
+            padding: 30px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 30px 15px;
+            }
+
+            .logo {
+                font-size: 2.3rem;
+            }
+
+            .card {
+                padding: 24px;
+                border-radius: 20px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            p, li {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="glow-blob glow-1"></div>
+    <div class="glow-blob glow-2"></div>
+
+    <header>
+        <div class="logo">Tic<span>Trek</span></div>
+    </header>
+
+    <main>
+        <div class="card">
+            <h1>Privacy Policy</h1>
+            <div class="last-updated">Last Updated: May 26, 2026</div>
+
+            <section>
+                <p>Welcome to <strong>TicTrek</strong>, a premium Tic-Tac-Toe mobile application. We respect your privacy and are committed to protecting it. This Privacy Policy describes how we handle user information in TicTrek.</p>
+            </section>
+
+            <section>
+                <h2>1. Information We Collect</h2>
+                <p>TicTrek is designed to protect your privacy and minimize data collection. Here is exactly what is stored and used:</p>
+                <ul>
+                    <li><strong>Game Statistics:</strong> We track wins, losses, draws, earned trophies, and gold coins. This data is used solely to record your local achievements, calculate your levels, and update shop unlocking states.</li>
+                    <li><strong>Local Customizations:</strong> Your selected marker skins, unlocked game boards, sound preferences, and vibration settings are saved.</li>
+                    <li><strong>Device Storage:</strong> All statistics, coins, and settings are saved directly on your device via local storage (SharedPreferences) and are never sent to external servers.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>2. Third-Party Services & Advertising</h2>
+                <p>To support development and offer free-to-play features (like earning rewards for watching ads), TicTrek integrates the <strong>Google AdMob SDK</strong>. AdMob may collect and process device-specific information, such as:</p>
+                <ul>
+                    <li>The advertising identifier (IDFA on iOS, AAID on Android).</li>
+                    <li>IP address, device info, and carrier details.</li>
+                    <li>Ad interaction data to prevent fraud, track performance, and deliver personalized or non-personalized advertisements.</li>
+                </ul>
+                <p>For more details on how Google uses this data, please read the <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">Google Ads & Privacy Policies</a>.</p>
+            </section>
+
+            <section>
+                <h2>3. How We Use Your Data</h2>
+                <p>We use the locally saved data to:</p>
+                <ul>
+                    <li>Maintain your progress (coins, custom skins, and records) between app launches.</li>
+                    <li>Calculate your Trophy levels based on match wins and draws.</li>
+                    <li>Optimize app performance, settings, and general gameplay mechanics.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>4. Data Retention and Deletion</h2>
+                <p>Because all of your gameplay records are stored locally on your device's private sandbox, we do not retain or store your data on external databases. If you wish to delete all of your data, you can do so at any time by:</p>
+                <ul>
+                    <li>Clearing the app storage / cache from your mobile device settings.</li>
+                    <li>Uninstalling the app, which automatically wipes all local sandbox data.</li>
+                    <li>Tapping "Reset All Stats" inside the app's Settings menu.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>5. Children's Privacy</h2>
+                <p>TicTrek is a fun and safe game for users of all ages. We do not knowingly collect personal details or track location data of children. Our third-party ad networks (AdMob) comply with COPPA guidelines to ensure safe, age-appropriate advertising practices.</p>
+            </section>
+
+            <section>
+                <h2>6. Changes to This Privacy Policy</h2>
+                <p>We may update our Privacy Policy from time to time. We recommend reviewing this page periodically for any changes. Changes are effective immediately once posted to this page.</p>
+            </section>
+
+            <section>
+                <h2>7. Contact Us</h2>
+                <p>If you have any questions or feedback regarding this Privacy Policy, feel free to contact us at our support email:</p>
+                
+                <div class="contact-box">
+                    <p><strong>akshatkhandelwal680@gmail.com</strong></p>
+                    <a href="mailto:akshatkhandelwal680@gmail.com?subject=TicTrek%20Privacy%20Policy%20Inquiry" class="btn-email">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        Email Support
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 TicTrek. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
