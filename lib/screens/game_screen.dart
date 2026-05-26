@@ -180,6 +180,10 @@ class _GameScreenViewState extends State<GameScreenView> {
         _gameOver = true;
         VibrationHelper.vibrate(widget.prefs, type: 'heavy');
         widget.onGameEnd(_winner);
+        // Show game over dialog after short delay
+        Timer(const Duration(milliseconds: 600), () {
+          if (mounted) _showGameOverDialog();
+        });
         return;
       }
     }
@@ -189,7 +193,213 @@ class _GameScreenViewState extends State<GameScreenView> {
       _gameOver = true;
       VibrationHelper.vibrate(widget.prefs, type: 'heavy');
       widget.onGameEnd('Draw');
+      Timer(const Duration(milliseconds: 600), () {
+        if (mounted) _showGameOverDialog();
+      });
     }
+  }
+
+  void _showGameOverDialog() {
+    final bool isWin = _winner == 'X';
+    final bool isDraw = _winner == 'Draw';
+    final bool isLoss = _winner == 'O';
+
+    final String emoji = isDraw ? '🤝' : isWin ? '🏆' : '💀';
+    final String title = isDraw
+        ? "IT'S A DRAW!"
+        : isWin
+            ? 'YOU WIN!'
+            : widget.mode == GameMode.vsAi
+                ? 'AI WINS!'
+                : 'PLAYER O WINS!';
+    final Color titleColor = isDraw
+        ? const Color(0xFFFDD835)
+        : isWin
+            ? Colors.greenAccent
+            : const Color(0xFFE74C3C);
+    final String coinsText = isWin
+        ? '+50 💰 Coins Earned!'
+        : isDraw
+            ? '+20 💰 Coins Earned!'
+            : 'Better luck next time!';
+    final Color coinsColor =
+        isLoss ? Colors.white54 : const Color(0xFFFDD835);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withAlpha(180),
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF0F4A81),
+                Color(0xFF002B4D),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(
+              color: const Color(0x4DFDD835),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: titleColor.withAlpha(60),
+                blurRadius: 30,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Big result emoji
+              Text(emoji, style: const TextStyle(fontSize: 64)),
+              const SizedBox(height: 12),
+              // Result title
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.outfit(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w900,
+                  color: titleColor,
+                  letterSpacing: 1.5,
+                  shadows: [
+                    Shadow(
+                      color: titleColor.withAlpha(120),
+                      blurRadius: 12,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Coins earned label
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0x1AFFD835),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0x33FDD835)),
+                ),
+                child: Text(
+                  coinsText,
+                  style: GoogleFonts.outfit(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: coinsColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 28),
+              // Action buttons row
+              Row(
+                children: [
+                  // HOME button
+                  Expanded(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          VibrationHelper.vibrate(widget.prefs, type: 'selection');
+                          Navigator.of(ctx).pop();
+                          widget.onBack();
+                        },
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: const Color(0x1AFFFFFF),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: const Color(0x33FFFFFF),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.home_rounded,
+                                  color: Colors.white70, size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                'HOME',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white70,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // RESTART button
+                  Expanded(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          VibrationHelper.vibrate(widget.prefs, type: 'selection');
+                          Navigator.of(ctx).pop();
+                          _resetGame();
+                        },
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFFFDD835),
+                                Color(0xFFF5A623),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x66F5A623),
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.refresh_rounded,
+                                  color: Color(0xFF1A1A1A), size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                'RESTART',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFF1A1A1A),
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _triggerEmote(String emote, bool isPlayer) {
@@ -369,14 +579,73 @@ class _GameScreenViewState extends State<GameScreenView> {
     );
   }
 
+  Color _getMarkerColor(String val, String skinId) {
+    if (val == 'X') {
+      switch (skinId) {
+        case 'classic':
+          return Colors.white;
+        case 'neon':
+          return const Color(0xFFFF00FF);
+        case 'scribble':
+          return const Color(0xFFBDC3C7);
+        default:
+          return Colors.white;
+      }
+    } else {
+      switch (skinId) {
+        case 'classic':
+          return const Color(0xFFFDD835);
+        case 'neon':
+          return const Color(0xFF00FFFF);
+        case 'scribble':
+          return const Color(0xFFE67E22);
+        default:
+          return Colors.white;
+      }
+    }
+  }
+
+  List<Shadow> _getMarkerShadows(String val, String skinId) {
+    final List<Shadow> baseShadows = [
+      const Shadow(
+        color: Color(0x99000000),
+        offset: Offset(0, 3),
+        blurRadius: 5,
+      ),
+    ];
+
+    if (skinId == 'neon') {
+      if (val == 'X') {
+        return [
+          const Shadow(color: Color(0xFFFF00FF), blurRadius: 15),
+          ...baseShadows,
+        ];
+      } else {
+        return [
+          const Shadow(color: Color(0xFF00FFFF), blurRadius: 15),
+          ...baseShadows,
+        ];
+      }
+    }
+
+    return baseShadows;
+  }
+
   Widget _buildCell(int index, bool isWinningCell) {
     final String val = _board[index];
-    Color markerColor = Colors.white;
+    final String activeSkinId = widget.prefs?.getString('equippedSkinId') ?? 'classic';
+    final skin = allSkins.firstWhere((s) => s.id == activeSkinId, orElse: () => allSkins[0]);
+
+    String markerText = '';
     if (val == 'X') {
-      markerColor = Colors.white;
+      markerText = skin.xMarker;
     } else if (val == 'O') {
-      markerColor = const Color(0xFFFDD835);
+      markerText = skin.oMarker;
     }
+
+    final Color markerColor = _getMarkerColor(val, skin.id);
+    final List<Shadow> markerShadows = _getMarkerShadows(val, skin.id);
+    final double markerFontSize = (skin.id == 'classic' || skin.id == 'neon' || skin.id == 'scribble') ? 48 : 40;
 
     return GestureDetector(
       onTap: () => _handleCellClick(index),
@@ -418,18 +687,12 @@ class _GameScreenViewState extends State<GameScreenView> {
             duration: const Duration(milliseconds: 300),
             curve: Curves.elasticOut,
             child: Text(
-              val,
+              markerText,
               style: GoogleFonts.outfit(
-                fontSize: 48,
+                fontSize: markerFontSize,
                 fontWeight: FontWeight.w900,
                 color: markerColor,
-                shadows: [
-                  Shadow(
-                    color: const Color(0x99000000),
-                    offset: const Offset(0, 3),
-                    blurRadius: 5,
-                  ),
-                ],
+                shadows: markerShadows,
               ),
             ),
           ),
