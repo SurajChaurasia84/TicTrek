@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'help_support_screen.dart';
+import '../main.dart';
 
 class SettingsScreenView extends StatefulWidget {
   final SharedPreferences? prefs;
@@ -84,6 +85,7 @@ class _SettingsScreenViewState extends State<SettingsScreenView> {
               onChanged: (v) {
                 setState(() => _soundEnabled = v);
                 _toggle('soundEnabled', v);
+                AudioManager.instance.updateBgMusicState(v);
               },
             ),
             const SizedBox(height: 10),
@@ -95,6 +97,9 @@ class _SettingsScreenViewState extends State<SettingsScreenView> {
               onChanged: (v) {
                 setState(() => _vibrationEnabled = v);
                 _toggle('vibrationEnabled', v);
+                if (v) {
+                  VibrationHelper.vibrate(widget.prefs, type: 'medium');
+                }
               },
             ),
             const SizedBox(height: 10),
