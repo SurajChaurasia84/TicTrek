@@ -4,6 +4,9 @@
         android:label="TicTrek"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2234072069154204~8503949190"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
