@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:vibration/vibration.dart';
 import 'screens/company_splash.dart';
 import 'screens/loading_screen.dart';
 import 'screens/main_tab_screen.dart';
@@ -321,19 +322,37 @@ class AudioManager {
 class VibrationHelper {
   static void vibrate(SharedPreferences? prefs, {String type = 'light'}) {
     final bool vibrationEnabled = prefs?.getBool('vibrationEnabled') ?? true;
-    if (vibrationEnabled) {
-      try {
+    if (!vibrationEnabled) return;
+
+    Vibration.hasVibrator().then((hasVibrator) {
+      if (hasVibrator == true) {
+        switch (type) {
+          case 'light':
+            Vibration.vibrate(duration: 35, amplitude: 120);
+            break;
+          case 'medium':
+            Vibration.vibrate(duration: 80, amplitude: 180);
+            break;
+          case 'heavy':
+            Vibration.vibrate(duration: 180, amplitude: 255);
+            break;
+          case 'selection':
+            Vibration.vibrate(duration: 15, amplitude: 90);
+            break;
+          default:
+            Vibration.vibrate(duration: 100);
+        }
+      } else {
+        // Fallback to standard HapticFeedback if no hardware vibrator detected
         switch (type) {
           case 'light':
             HapticFeedback.lightImpact();
             break;
           case 'medium':
             HapticFeedback.mediumImpact();
-            HapticFeedback.vibrate();
             break;
           case 'heavy':
             HapticFeedback.heavyImpact();
-            HapticFeedback.vibrate();
             break;
           case 'selection':
             HapticFeedback.selectionClick();
@@ -341,12 +360,11 @@ class VibrationHelper {
           default:
             HapticFeedback.vibrate();
         }
-      } catch (e) {
-        try {
-          HapticFeedback.vibrate();
-        } catch (_) {}
       }
-    }
+    }).catchError((_) {
+      // General fallback
+      HapticFeedback.vibrate();
+    });
   }
 }
 
