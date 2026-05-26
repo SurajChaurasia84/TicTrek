@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'screens/company_splash.dart';
 import 'screens/loading_screen.dart';
 import 'screens/main_tab_screen.dart';
@@ -106,6 +107,7 @@ class _GameManagerState extends State<GameManager> {
     setState(() {
       _currentScreen = ScreenState.homeScreen;
     });
+    AudioManager.instance.startBgMusic(_prefs);
   }
 
   void _startGame(GameMode mode) {
@@ -220,7 +222,94 @@ class _GameManagerState extends State<GameManager> {
           difficulty: _selectedDifficulty,
           onBack: _backToHome,
           onGameEnd: _updateStats,
+          prefs: _prefs,
         );
+    }
+  }
+}
+
+class AudioManager {
+  static final AudioManager instance = AudioManager._internal();
+  AudioManager._internal();
+
+  final AudioPlayer _bgPlayer = AudioPlayer();
+  bool _initialized = false;
+
+  Future<void> init() async {
+    if (_initialized) return;
+    try {
+      await _bgPlayer.setReleaseMode(ReleaseMode.loop);
+      _initialized = true;
+    } catch (e) {
+      debugPrint('Error initializing AudioManager: $e');
+    }
+  }
+
+  Future<void> startBgMusic(SharedPreferences? prefs) async {
+    await init();
+    final bool soundEnabled = prefs?.getBool('soundEnabled') ?? true;
+    if (soundEnabled) {
+      try {
+        if (_bgPlayer.state != PlayerState.playing) {
+          await _bgPlayer.play(AssetSource('bg.mp3'));
+        }
+      } catch (e) {
+        debugPrint('Error starting bg music: $e');
+      }
+    }
+  }
+
+  Future<void> stopBgMusic() async {
+    try {
+      await _bgPlayer.stop();
+    } catch (e) {
+      debugPrint('Error stopping bg music: $e');
+    }
+  }
+
+  Future<void> updateBgMusicState(bool soundEnabled) async {
+    if (soundEnabled) {
+      try {
+        if (_bgPlayer.state != PlayerState.playing) {
+          await _bgPlayer.play(AssetSource('bg.mp3'));
+        }
+      } catch (e) {
+        debugPrint('Error updating bg music (playing): $e');
+      }
+    } else {
+      await stopBgMusic();
+    }
+  }
+}
+
+class VibrationHelper {
+  static void vibrate(SharedPreferences? prefs, {String type = 'light'}) {
+    final bool vibrationEnabled = prefs?.getBool('vibrationEnabled') ?? true;
+    if (vibrationEnabled) {
+      try {
+        switch (type) {
+          case 'light':
+            HapticFeedback.lightImpact();
+            break;
+          case 'medium':
+            HapticFeedback.mediumImpact();
+            HapticFeedback.vibrate();
+            break;
+          case 'heavy':
+            HapticFeedback.heavyImpact();
+            HapticFeedback.vibrate();
+            break;
+          case 'selection':
+            HapticFeedback.selectionClick();
+            break;
+          default:
+            HapticFeedback.vibrate();
+        }
+      } catch (e) {
+        try {
+          HapticFeedback.vibrate();
+        } catch (_) {}
+      }
     }
   }
 }
