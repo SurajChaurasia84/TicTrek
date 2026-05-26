@@ -161,10 +161,28 @@ class HomeScreenView extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.refresh_rounded, color: Colors.white54),
-                tooltip: 'Reset Stats',
-                onPressed: onResetStats,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0x26FDD835),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0x66FDD835), width: 1.5),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('🏆', style: TextStyle(fontSize: 16)),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${(playerWins * 10) + (draws * 2)}',
+                      style: GoogleFonts.outfit(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        color: const Color(0xFFFDD835),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
