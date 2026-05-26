@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../main.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class GameScreenView extends StatefulWidget {
   final GameMode mode;
   final Difficulty difficulty;
   final VoidCallback onBack;
   final Function(String) onGameEnd;
+  final SharedPreferences? prefs;
 
   const GameScreenView({
     super.key,
@@ -16,6 +19,7 @@ class GameScreenView extends StatefulWidget {
     required this.difficulty,
     required this.onBack,
     required this.onGameEnd,
+    required this.prefs,
   });
 
   @override
@@ -53,6 +57,7 @@ class _GameScreenViewState extends State<GameScreenView> {
 
   void _handleCellClick(int index) {
     if (_board[index] != '' || _gameOver || _aiThinking) return;
+    VibrationHelper.vibrate(widget.prefs, type: 'light');
 
     setState(() {
       _board[index] = _currentPlayer;
@@ -173,6 +178,7 @@ class _GameScreenViewState extends State<GameScreenView> {
         _winner = _board[line[0]];
         _winningLine = line;
         _gameOver = true;
+        VibrationHelper.vibrate(widget.prefs, type: 'heavy');
         widget.onGameEnd(_winner);
         return;
       }
@@ -181,6 +187,7 @@ class _GameScreenViewState extends State<GameScreenView> {
     if (!_board.contains('')) {
       _winner = 'Draw';
       _gameOver = true;
+      VibrationHelper.vibrate(widget.prefs, type: 'heavy');
       widget.onGameEnd('Draw');
     }
   }
@@ -188,6 +195,9 @@ class _GameScreenViewState extends State<GameScreenView> {
   void _triggerEmote(String emote, bool isPlayer) {
     final emoteId = DateTime.now().millisecondsSinceEpoch;
     final xPosition = isPlayer ? 0.25 : 0.75;
+    if (isPlayer) {
+      VibrationHelper.vibrate(widget.prefs, type: 'medium');
+    }
     setState(() {
       _activeEmotes.add(
         ActiveEmote(
@@ -217,10 +227,12 @@ class _GameScreenViewState extends State<GameScreenView> {
 
   @override
   Widget build(BuildContext context) {
+    final bool showEmotes = widget.prefs?.getBool('showEmotes') ?? true;
     return Stack(
       children: [
         // Emotes float overlays
-        ..._activeEmotes.map((e) => FloatingEmoteWidget(key: ValueKey(e.id), emote: e)),
+        if (showEmotes)
+          ..._activeEmotes.map((e) => FloatingEmoteWidget(key: ValueKey(e.id), emote: e)),
 
         // Main game content layout
         Padding(
@@ -293,8 +305,10 @@ class _GameScreenViewState extends State<GameScreenView> {
               const SizedBox(height: 25),
 
               // Interactive Emotes triggers Panel
-              _buildEmoteTriggers(),
-              const SizedBox(height: 10),
+              if (showEmotes) ...[
+                _buildEmoteTriggers(),
+                const SizedBox(height: 10),
+              ],
             ],
           ),
         ),
