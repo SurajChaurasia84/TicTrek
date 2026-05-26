@@ -71,12 +71,12 @@ class HelpSupportScreen extends StatelessWidget {
                         context: context,
                         icon: Icons.email_rounded,
                         title: 'Email Support',
-                        subtitle: 'Send us an email at support@tictrek.com',
+                        subtitle: 'Send us an email',
                         color: Colors.lightBlueAccent,
                         onTap: () async {
                           final Uri emailUri = Uri(
                             scheme: 'mailto',
-                            path: 'support@tictrek.com',
+                            path: 'akshatkhandelwal680@gmail.com',
                             queryParameters: {
                               'subject': 'TicTrek Support Request',
                             },
