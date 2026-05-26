@@ -33,17 +33,6 @@ class HelpSupportScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'FREQUENTLY ASKED QUESTIONS',
-                        style: GoogleFonts.outfit(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
-                          color: const Color(0xFFFDD835),
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      
                       const FaqItem(
                         question: 'How to play TicTrek?',
                         answer: 'TicTrek is a classic Tic-Tac-Toe game. Take turns placing your mark (X or O) on a 3x3 grid. The first player to align 3 of their marks in a row (horizontally, vertically, or diagonally) wins the game. You can play against the computer or with a friend locally.',
