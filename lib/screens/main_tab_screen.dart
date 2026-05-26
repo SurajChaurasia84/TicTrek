@@ -67,6 +67,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
           opponentWins: widget.opponentWins,
           draws: widget.draws,
           onResetStats: widget.onResetStats,
+          prefs: widget.prefs,
         );
       case 1:
         return const ShopScreenView(key: ValueKey('shop_tab'));
