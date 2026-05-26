@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../main.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class HomeScreenView extends StatelessWidget {
   final Function(GameMode) onStartGame;
   final Difficulty selectedDifficulty;
@@ -10,6 +12,7 @@ class HomeScreenView extends StatelessWidget {
   final int opponentWins;
   final int draws;
   final VoidCallback onResetStats;
+  final SharedPreferences? prefs;
 
   const HomeScreenView({
     super.key,
@@ -20,6 +23,7 @@ class HomeScreenView extends StatelessWidget {
     required this.opponentWins,
     required this.draws,
     required this.onResetStats,
+    required this.prefs,
   });
 
   @override
@@ -62,18 +66,24 @@ class HomeScreenView extends StatelessWidget {
             // Main Battle Options
             _buildBattleModeButton(
               title: 'PLAYER BATTLE',
-              subtitle: 'VS AI OPPONENT',
+              subtitle: 'VS AI',
               icon: Icons.android_rounded,
               color: const Color(0xFF187BCD),
-              onTap: () => onStartGame(GameMode.vsAi),
+              onTap: () {
+                VibrationHelper.vibrate(prefs, type: 'selection');
+                onStartGame(GameMode.vsAi);
+              },
             ),
             const SizedBox(height: 15),
             _buildBattleModeButton(
               title: 'PASS & PLAY',
-              subtitle: 'VS LOCAL FRIEND',
+              subtitle: 'VS FRIEND',
               icon: Icons.people_alt_rounded,
               color: const Color(0xFF2ECC71),
-              onTap: () => onStartGame(GameMode.pvp),
+              onTap: () {
+                VibrationHelper.vibrate(prefs, type: 'selection');
+                onStartGame(GameMode.pvp);
+              },
             ),
             const SizedBox(height: 25),
             // Difficulty Section Header
@@ -314,7 +324,10 @@ class HomeScreenView extends StatelessWidget {
     final bool isSelected = selectedDifficulty == diff;
     return Expanded(
       child: GestureDetector(
-        onTap: () => onChangeDifficulty(diff),
+        onTap: () {
+          VibrationHelper.vibrate(prefs, type: 'light');
+          onChangeDifficulty(diff);
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           padding: const EdgeInsets.symmetric(vertical: 16),
