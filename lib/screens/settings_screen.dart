@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 import 'help_support_screen.dart';
 
 class SettingsScreenView extends StatefulWidget {
@@ -180,6 +181,22 @@ class _SettingsScreenViewState extends State<SettingsScreenView> {
             ),
             const SizedBox(height: 28),
 
+            // More
+            _buildSectionTitle('MORE'),
+            const SizedBox(height: 12),
+            _buildActionTile(
+              icon: Icons.share_rounded,
+              title: 'Share App',
+              color: Colors.greenAccent,
+              onTap: () {
+                Share.share(
+                  'Check out TicTrek - the ultimate premium Tic Tac Toe game! Download now from https://tictrek.com',
+                );
+              },
+              showChevron: false,
+            ),
+            const SizedBox(height: 28),
+
             // About
             _buildSectionTitle('ABOUT'),
             const SizedBox(height: 12),
@@ -326,9 +343,10 @@ class _SettingsScreenViewState extends State<SettingsScreenView> {
   Widget _buildActionTile({
     required IconData icon,
     required String title,
-    required String subtitle,
+    String? subtitle,
     required Color color,
     required VoidCallback onTap,
+    bool showChevron = true,
   }) {
     return Material(
       color: Colors.transparent,
@@ -365,17 +383,21 @@ class _SettingsScreenViewState extends State<SettingsScreenView> {
                         color: Colors.white,
                       ),
                     ),
-                    Text(
-                      subtitle,
-                      style: GoogleFonts.outfit(
-                        fontSize: 12,
-                        color: Colors.white38,
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: GoogleFonts.outfit(
+                          fontSize: 12,
+                          color: Colors.white38,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: color.withAlpha(150)),
+              if (showChevron)
+                Icon(Icons.chevron_right_rounded, color: color.withAlpha(150)),
             ],
           ),
         ),
