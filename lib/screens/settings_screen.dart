@@ -190,7 +190,7 @@ class _SettingsScreenViewState extends State<SettingsScreenView> {
               color: Colors.greenAccent,
               onTap: () {
                 Share.share(
-                  'Check out TicTrek - the ultimate premium Tic Tac Toe game! Download now from https://tictrek.com',
+                  'Check out TicTrek - the ultimate premium Tic Tac Toe game! Download now from https://play.google.com/store/apps/details?id=com.tictrek.toe.gems',
                 );
               },
               showChevron: false,
